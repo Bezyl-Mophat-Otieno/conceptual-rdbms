@@ -1,3 +1,6 @@
+## Project Structure
+
+```text
 rdbms/
 │
 ├─ package.json
@@ -51,10 +54,10 @@ rdbms/
 │   │       ├─ errors.js
 │   │       └─ types.js
 │   │
-│   ├─ repl/                     # CLI client (later)
+│   ├─ repl/                     # CLI client
 │   │   └─ repl.js
 │   │
-│   └─ web/                      # Demo web app (later)
+│   └─ web/                      # Demo web app
 │       └─ app.js
 │
 ├─ data/
