@@ -1,5 +1,3 @@
-// src/engine/catalog/index.js
-
 class IndexMetadata {
   constructor({ name, tableName, columnName, unique = false }) {
     this.name = name;

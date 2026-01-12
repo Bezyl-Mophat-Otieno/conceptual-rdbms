@@ -1,5 +1,3 @@
-// src/engine/catalog/catalog.js
-
 const { TableMetadata } = require("./table");
 
 class Catalog {
