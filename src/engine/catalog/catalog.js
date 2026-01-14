@@ -49,7 +49,7 @@ class Catalog {
 
   // ---- Introspection ----
 
-  listTables() {
+  getTables() {
     return Array.from(this.tables.keys());
   }
 }
