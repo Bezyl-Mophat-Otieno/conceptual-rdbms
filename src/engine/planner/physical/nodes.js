@@ -24,6 +24,7 @@ class FilterNode extends PhysicalPlanNode {
   constructor({ child, predicate }) {
     super();
     this.child = child;
+    this.predicate = predicate;
   }
 }
 
@@ -40,8 +41,10 @@ class NestedLoopJoinNode extends PhysicalPlanNode {
     super();
     this.left = left;
     this.right = right;
+    this.predicate = predicate;
   }
 }
+
 
 class InsertNode extends PhysicalPlanNode {
   constructor({ tableName, row }) {

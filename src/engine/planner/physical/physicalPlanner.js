@@ -6,20 +6,45 @@ const {
   NestedLoopJoinNode,
   InsertNode
 } = require("./nodes");
+const {compilePredicate} = require('./predicateCompiler')
 
 class PhysicalPlanner {
   constructor(catalog) {
     this.catalog = catalog;
   }
 
-  plan(logicalPlan) {
-    switch (logicalPlan.type) {
-      case "Select":
-        return this.planSelect(logicalPlan);
+
+  plan(logicalNode) {
+    switch (logicalNode.type) {
+      case "Scan":
+        return new SeqScanNode({ tableName: logicalNode.tableName });
+
+      case "Filter": {
+        const child = this.plan(logicalNode.child);
+        return this.planFilter(child, logicalNode.predicate);
+      }
+
+      case "Projection":
+        return new ProjectionNode({
+          child: this.plan(logicalNode.child),
+          columns: logicalNode.columns
+        });
+
+      case "Join":
+        return new NestedLoopJoinNode({
+          left: this.plan(logicalNode.left),
+          right: this.plan(logicalNode.right),
+          predicate: logicalNode.predicate
+        });
+
       case "Insert":
-        return this.planInsert(logicalPlan);
+        return new InsertNode({
+          tableName: logicalNode.tableName,
+          row: logicalNode.row
+        });
+
       default:
-        throw new Error(`Unsupported logical plan: ${logicalPlan.type}`);
+        throw new Error(`Unknown logical node: ${logicalNode.type}`);
     }
   }
 
@@ -40,29 +65,73 @@ class PhysicalPlanner {
     return root;
   }
 
-  planFrom(from) {
-    return new SeqScanNode({ tableName: from.tableName });
+planFrom(from) {
+  let left = new SeqScanNode({ tableName: from.tableName });
+
+  for (const join of from.joins || []) {
+    const right = new SeqScanNode({ tableName: join.table });
+
+    const predicateFn = compilePredicate(join.on);
+
+    left = new NestedLoopJoinNode({
+      left,
+      right,
+      predicate: predicateFn
+    });
   }
 
-  applyFilter(child, predicate, tableName) {
-    const table = this.catalog.getTable(tableName);
+  return left;
+}
+
+
+  planFilter(child, predicate) {
+  if (child instanceof SeqScanNode) {
+    const table = this.catalog.getTable(child.tableName);
     const index = table
       .getIndexes()
-      .find(idx => idx.columnName === predicate.column);
+      .find(i => i.columnName === predicate.left.column);
 
     if (index && predicate.operator === "=") {
       return new IndexScanNode({
-        tableName,
+        tableName: child.tableName,
         indexName: index.name,
-        value: predicate.value
+        value: predicate.right.value
       });
     }
+  }
 
-    return new FilterNode({
-      child,
-      predicate
+  const predicateFn = compilePredicate(predicate);
+
+
+  return new FilterNode({ child, predicate: predicateFn });
+  }
+  
+
+applyFilter(child, predicate, tableName) {
+  const table = this.catalog.getTable(tableName);
+
+  const index = table
+    .getIndexes()
+    .find(idx => idx.columnName === predicate.left.column);
+
+  // Index scan path
+  if (index && predicate.operator === "=" && predicate.right.value !== undefined) {
+    return new IndexScanNode({
+      tableName,
+      indexName: index.name,
+      value: predicate.right.value
     });
   }
+
+  // Sequential filter path
+  const predicateFn = compilePredicate(predicate);
+
+  return new FilterNode({
+    child,
+    predicate: predicateFn
+  });
+}
+
 
   planInsert(plan) {
     return new InsertNode({

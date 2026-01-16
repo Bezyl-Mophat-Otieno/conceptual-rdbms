@@ -6,6 +6,7 @@ const { RowID } = require("./rowId");
 class FileTableStorage {
   constructor(dbPath, tableName) {
     this.tablePath = path.join(dbPath, `${tableName}.table`);
+    this.tableName = tableName
 
     // Ensure file exists
     if (!fs.existsSync(this.tablePath)) {
@@ -44,19 +45,21 @@ class FileTableStorage {
   /**
    * Sequential scan of all rows
    */
-  async *scan() {
-    const fileStream = fs.createReadStream(this.tablePath);
+  *scan() {
+    const data = fs.readFileSync(this.tablePath, "utf-8");
 
-    const rl = readline.createInterface({
-      input: fileStream,
-      crlfDelay: Infinity
-    });
+    if (!data) return;
 
-    for await (const line of rl) {
-      if (line.trim().length === 0) continue;
+    const lines = data.split("\n");
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (line.length === 0) continue;
+
       yield JSON.parse(line);
     }
   }
+
 }
 
 module.exports = { FileTableStorage };

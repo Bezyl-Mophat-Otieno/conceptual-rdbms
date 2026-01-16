@@ -7,15 +7,12 @@ const { TableSchema, Column, DataType } = require("../engine/common/types");
 const dbPath = path.join(__dirname, "../../data/mydb")
 const catalog = new Catalog();
 const storageEngine = new FileStorageEngine(catalog, dbPath);
-
-catalog.addTable(
-  new TableSchema("users", [
+const usersTableSchema=  new TableSchema("users", [
     new Column({ name: "id", type: DataType.INT, primaryKey: true }),
     new Column({ name: "name", type: DataType.STRING, maxLength: 30 })
   ])
-);
 
-storageEngine.createTable(catalog.getTable("users"));
+storageEngine.createTable(usersTableSchema);
 
 const engine = new Engine({ catalog, storageEngine });
 

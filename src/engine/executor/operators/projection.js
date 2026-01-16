@@ -18,7 +18,7 @@ class Projection extends Operator {
 
     const values = {};
     for (const col of this.columns) {
-      values[col] = row.get(col);
+        values[col.column] = row.get(col.column);
     }
     return new Row(values);
   }

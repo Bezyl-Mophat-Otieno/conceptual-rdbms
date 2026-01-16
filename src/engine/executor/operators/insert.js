@@ -13,7 +13,7 @@ class Insert extends Operator {
 
   next() {
     if (this.done) return null;
-    this.storageEngine.insertRow(this.tableStorage, this.row);
+    this.storageEngine.insertRow(this.tableStorage.tableName, this.row);
     this.done = true;
     return null;
   }

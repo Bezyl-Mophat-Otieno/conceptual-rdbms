@@ -57,7 +57,7 @@ class FileStorageEngine {
       throw new Error(`Table '${tableName}' already exists`);
     }
 
-    this.catalog.addTable(tableSchema);
+    this.catalog.createTable(tableSchema);
 
     const tableStorage = new FileTableStorage(
       this.dbPath,
@@ -77,7 +77,7 @@ class FileStorageEngine {
       throw new Error(`Index '${indexName}' already exists`);
     }
 
-    this.catalog.addIndex(indexMeta);
+    this.catalog.createIndex(indexMeta);
 
     const indexStorage = new FileIndexStorage(
       this.dbPath,

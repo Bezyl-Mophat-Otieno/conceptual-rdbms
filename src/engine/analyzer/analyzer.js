@@ -1,3 +1,4 @@
+const {validateValue} = require('../common/types')
 class Analyzer {
   constructor(catalog) {
     this.catalog = catalog;
@@ -30,7 +31,7 @@ class Analyzer {
       ...ast,
       columns,
       where,
-      from: tableScopes
+      scopes: tableScopes
     };
   }
 
@@ -42,8 +43,10 @@ class Analyzer {
       throw new Error("Column count does not match VALUES count");
     }
 
+
     schema.columns.forEach((col, i) => {
-      if (!col.type.validate(ast.values[i])) {
+      const literalInsertValue = ast.values[i]
+      if (!validateValue(col.type, literalInsertValue.value)) {
         throw new Error(
           `Invalid value for column ${col.name}: ${ast.values[i]}`
         );

@@ -20,22 +20,31 @@ class Engine {
   async execute(sql) {
     // 1. Parse
     const tokens = tokenize(sql);
+    console.log("tokens", tokens)
     const ast = new Parser(tokens).parse();
+    console.log("ast", ast)
 
     // 2. Analyze
     const analyzedAst = this.analyzer.analyze(ast);
+    console.log("analyzedAst", analyzedAst)
+
 
     // 3. Logical plan
     const logicalPlan = this.logicalPlanner.plan(analyzedAst);
+    console.log("logicalPlan", logicalPlan)
+
 
     // 4. Physical plan
     const physicalPlan = this.physicalPlanner.plan(logicalPlan);
+    console.log("physicalPlan", physicalPlan)
+
 
     // 5. Build executor operators
     const executablePlan = buildExecutor(
       physicalPlan,
       this.storageEngine
     );
+    console.log("executablePlan", executablePlan)
 
     // 6. Execute
     return this.executor.execute(executablePlan);

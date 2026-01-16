@@ -52,6 +52,9 @@ class Catalog {
   getTables() {
     return Array.from(this.tables.keys());
   }
+  getIndexes() {
+    return Array.from(this.tables.values).map((table)=> table.indexes)
+  }
 }
 
 module.exports = { Catalog };
