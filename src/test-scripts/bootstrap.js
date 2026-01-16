@@ -19,5 +19,5 @@ const engine = new Engine({ catalog, storageEngine });
 (async () => {
   await engine.execute("INSERT INTO users VALUES (1, 'Alice')");
   const result = await engine.execute("SELECT name FROM users WHERE id = 1");
-  console.log(result);
+  console.log(result)
 })();

@@ -1,4 +1,5 @@
 const {validateValue} = require('../common/types')
+const {Row} = require('../common/types')
 class Analyzer {
   constructor(catalog) {
     this.catalog = catalog;
@@ -35,26 +36,38 @@ class Analyzer {
     };
   }
 
-  analyzeInsert(ast) {
-    const table = this.catalog.getTable(ast.table);
-    const schema = table.schema;
+analyzeInsert(ast) {
+  const table = this.catalog.getTable(ast.table);
+  const schema = table.schema;
 
-    if (ast.values.length !== schema.columns.length) {
-      throw new Error("Column count does not match VALUES count");
+  if (ast.values.length !== schema.columns.length) {
+    throw new Error("Column count does not match VALUES count");
+  }
+
+  const rowValues = {};
+
+  schema.columns.forEach((column, i) => {
+    const literal = ast.values[i];
+
+    console.log("literal",literal)
+
+    if (!validateValue(column.type, literal.value)) {
+      throw new Error(
+        `Invalid value for column ${column.name}: ${literal.value}`
+      );
     }
 
+    rowValues[column.name] = literal.value;
+  });
 
-    schema.columns.forEach((col, i) => {
-      const literalInsertValue = ast.values[i]
-      if (!validateValue(col.type, literalInsertValue.value)) {
-        throw new Error(
-          `Invalid value for column ${col.name}: ${ast.values[i]}`
-        );
-      }
-    });
+  console.log("rowValues",rowValues)
 
-    return ast;
-  }
+  return {
+    type: "Insert",
+    table: ast.table,
+    row: new Row(rowValues)
+  };
+}
 
   resolveFrom(from) {
     const scopes = [];

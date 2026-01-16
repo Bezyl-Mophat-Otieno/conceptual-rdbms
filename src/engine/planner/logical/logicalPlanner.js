@@ -14,7 +14,7 @@ class LogicalPlanner {
       case "Insert":
         return new LogicalInsert({
           tableName: ast.table,
-          row: ast.values
+          row: ast.row
         });
       default:
         throw new Error(`Unsupported AST node: ${ast.type}`);

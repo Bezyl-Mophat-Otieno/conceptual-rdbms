@@ -1,6 +1,5 @@
 function compilePredicate(predicate) {
   const { left, operator, right } = predicate;
-  console.log('predicate', predicate)
 
   const opFn = getOperatorFn(operator);
 

@@ -50,12 +50,10 @@ class FileTableStorage {
 
     if (!data) return;
 
+
     const lines = data.split("\n");
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (line.length === 0) continue;
-
+    for( let line of lines){
+      if (line.trim().length === 0) continue;
       yield JSON.parse(line);
     }
   }
