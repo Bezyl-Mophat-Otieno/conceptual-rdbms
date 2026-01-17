@@ -1,4 +1,5 @@
 const { Operator } = require("./operator");
+const {Row} = require("../../common/types")
 
 class SeqScan extends Operator {
   constructor({ tableStorage }) {
@@ -13,7 +14,7 @@ class SeqScan extends Operator {
 
   next() {
     const { value, done } = this.iterator.next();
-    return done ? null : value;
+    return done ? null : new Row(value);
   }
 
   close() {

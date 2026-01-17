@@ -1,4 +1,5 @@
 const { Operator } = require("./operator");
+const {Row} = require("../../common/types")
 
 class IndexScan extends Operator {
   constructor({ indexStorage, tableStorage, value }) {
@@ -12,11 +13,12 @@ class IndexScan extends Operator {
   open() {
     this.rowIdIterator = this.indexStorage.lookup(this.value);
   }
-
   next() {
     const { value: rowId, done } = this.rowIdIterator.next();
     if (done) return null;
-    return this.tableStorage.get(rowId);
+
+    const raw = this.tableStorage.get(rowId);
+    return raw ? new Row(raw) : null;
   }
 
   close() {

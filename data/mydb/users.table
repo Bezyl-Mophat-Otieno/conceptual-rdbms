@@ -1,8 +1,2 @@
-[{"type":"Literal","value":1},{"type":"Literal","value":"Alice"}]
-[{"type":"Literal","value":1},{"type":"Literal","value":"Alice"}]
-[{"type":"Literal","value":1},{"type":"Literal","value":"Alice"}]
-[{"type":"Literal","value":1},{"type":"Literal","value":"Alice"}]
-[{"type":"Literal","value":1},{"type":"Literal","value":"Alice"}]
-[{"type":"Literal","value":1},{"type":"Literal","value":"Alice"}]
-[{"type":"Literal","value":1},{"type":"Literal","value":"Alice"}]
-
+{"id":1,"name":"Alice"}
+{"id":1,"name":"Alice"}

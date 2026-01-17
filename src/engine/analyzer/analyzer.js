@@ -49,8 +49,6 @@ analyzeInsert(ast) {
   schema.columns.forEach((column, i) => {
     const literal = ast.values[i];
 
-    console.log("literal",literal)
-
     if (!validateValue(column.type, literal.value)) {
       throw new Error(
         `Invalid value for column ${column.name}: ${literal.value}`
@@ -59,8 +57,6 @@ analyzeInsert(ast) {
 
     rowValues[column.name] = literal.value;
   });
-
-  console.log("rowValues",rowValues)
 
   return {
     type: "Insert",

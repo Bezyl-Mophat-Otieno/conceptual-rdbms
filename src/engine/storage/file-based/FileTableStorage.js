@@ -1,7 +1,7 @@
 const fs = require("node:fs");
-const readline = require("node:readline");
 const path = require("node:path");
 const { RowID } = require("./rowId");
+const {Row} = require("../../common/types")
 
 class FileTableStorage {
   constructor(dbPath, tableName) {
@@ -18,15 +18,21 @@ class FileTableStorage {
    * Append a row to the table file
    */
   insert(row) {
-    const serialized = JSON.stringify(row) + "\n";
+    const data =
+      row instanceof Row
+        ? row.toObject()
+        : row;
+
+    const serialized = JSON.stringify(data) + "\n";
 
     const stats = fs.statSync(this.tablePath);
-    const lineNumber = stats.size === 0
-      ? 0
-      : fs.readFileSync(this.tablePath, "utf-8").split("\n").length - 1;
+    const lineNumber =
+      stats.size === 0
+        ? 0
+        : fs.readFileSync(this.tablePath, "utf-8")
+            .split("\n").length - 1;
 
     fs.appendFileSync(this.tablePath, serialized);
-
     return new RowID(lineNumber);
   }
 
