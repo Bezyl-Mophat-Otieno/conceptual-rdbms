@@ -5,7 +5,7 @@ const { FileStorageEngine } = require("../engine/storage/file-based/FileStorageE
 const { TableSchema, Column, DataType } = require("../engine/common/types");
 
 const dbPath = path.join(__dirname, "../../data/mydb")
-const catalog = new Catalog();
+const catalog = new Catalog({ dbPath });
 const storageEngine = new FileStorageEngine(catalog, dbPath);
 const usersTableSchema=  new TableSchema("users", [
     new Column({ name: "id", type: DataType.INT, primaryKey: true }),
@@ -21,3 +21,8 @@ const engine = new Engine({ catalog, storageEngine });
   const result = await engine.execute("SELECT name FROM users WHERE id = 1");
   console.log("SELECT name FROM users WHERE id = 1. RESULT", result)
 })();
+
+
+const { startRepl } = require("../repl");
+
+startRepl({ dbPath });

@@ -1,8 +1,21 @@
 const { TableMetadata } = require("./table");
+const { FileCatalogStorage } = require("./FileCatalogStorage");
 
 class Catalog {
-  constructor() {
-    this.tables = new Map(); // tableName -> TableMetadata
+  constructor({ dbPath }) {
+    this.tables = new Map();
+    this.storage = new FileCatalogStorage(dbPath);
+    this._load();
+  }
+
+  _load() {
+    const raw = this.storage.load();
+    this.tables = this.storage.deserialize(raw);
+  }
+
+  _persist() {
+    const serialized = this.storage.serialize(this);
+    this.storage.save(serialized);
   }
 
   // ---- Table operations ----
@@ -12,12 +25,14 @@ class Catalog {
       throw new Error(`Table already exists: ${tableSchema.tableName}`);
     }
 
-    const tableMeta = new TableMetadata(tableSchema);
-    this.tables.set(tableSchema.tableName, tableMeta);
+    const meta = new TableMetadata(tableSchema);
+    this.tables.set(tableSchema.tableName, meta);
+    this._persist();
   }
 
   dropTable(tableName) {
     this.tables.delete(tableName);
+    this._persist();
   }
 
   hasTable(tableName) {
@@ -26,9 +41,7 @@ class Catalog {
 
   getTable(tableName) {
     const table = this.tables.get(tableName);
-    if (!table) {
-      throw new Error(`Table not found: ${tableName}`);
-    }
+    if (!table) throw new Error(`Table not found: ${tableName}`);
     return table;
   }
 
@@ -37,6 +50,7 @@ class Catalog {
   createIndex(indexMeta) {
     const table = this.getTable(indexMeta.tableName);
     table.addIndex(indexMeta);
+    this._persist();
   }
 
   getIndexesForTable(tableName) {
@@ -52,7 +66,7 @@ class Catalog {
   getTables() {
     return Array.from(this.tables.keys());
   }
-  getIndexes() {
+    getIndexes() {
     return Array.from(this.tables.values).map((table)=> table.indexes)
   }
 }

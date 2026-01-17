@@ -1,0 +1,26 @@
+{
+  "tables": {
+    "users": {
+      "schema": {
+        "tableName": "users",
+        "columns": [
+          {
+            "name": "id",
+            "type": "INT",
+            "primaryKey": true,
+            "unique": false,
+            "maxLength": null
+          },
+          {
+            "name": "name",
+            "type": "STRING",
+            "primaryKey": false,
+            "unique": false,
+            "maxLength": 30
+          }
+        ]
+      },
+      "indexes": []
+    }
+  }
+}
